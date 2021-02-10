@@ -100,10 +100,17 @@ uint16_t INA260::getConfig()
 bool INA260::begin(int sda, int scl, uint32_t frequency)
 {
   bool ret = Wire.begin(sda, scl, frequency);
+  /*
   writeRegister(INA260_REG_CONFIGURATION, INA260_CONF_RESET_INACTIVE |
                                               INA260_CONF_MODE_CONT_SHUNT_AND_BUS |
                                               INA260_CONF_SHCT_1100uS |
                                               INA260_CONF_VBUSCT_1100uS |
                                               INA260_CONF_AVG_16);
+  */
+  writeRegister(INA260_REG_CONFIGURATION, INA260_CONF_RESET_INACTIVE |
+                                              INA260_CONF_MODE_CONT_SHUNT_AND_BUS |
+                                              INA260_CONF_SHCT_1100uS |
+                                              INA260_CONF_VBUSCT_1100uS |
+                                              INA260_CONF_AVG_1);
   return ret;
 }
