@@ -22,6 +22,9 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(LED_NUM, PIN, NEO_GRB + NEO_KHZ800);
 // on a live circuit...if you must, connect GND first.
 #include "mizu.inc"
 #include "honoo.inc"
+#include "kaminari.inc"
+#include "mario.inc"
+
 float ax, ay, az;
 float cvec[3];
 int cvec_cnt = 0;
@@ -74,7 +77,45 @@ void honoo_no_kokyuu(uint8_t wait_ms)
     Serial.println(micros() - start2);
 }
 
-bool btn = false;
+void kaminari_no_kokyuu(uint8_t wait_ms)
+{
+    uint16_t i, j;
+    uint16_t line = (sizeof(kaminari) / sizeof(kaminari[0][0])) / strip.numPixels();
+    uint32_t start;
+    uint32_t start2 = micros();
+    for (j = 0; j < line; j++)
+    {
+        start = micros();
+        for (i = 0; i < strip.numPixels(); i++)
+        {
+            strip.setPixelColor(i, kaminari[i][j]);
+        }
+        strip.show();
+        delayMicroseconds((wait_ms * 1000) - (micros() - start));
+    }
+    Serial.println(micros() - start2);
+}
+
+void kaminari_no_mario(uint8_t wait_ms)
+{
+    uint16_t i, j;
+    uint16_t line = (sizeof(mario) / sizeof(mario[0][0])) / strip.numPixels();
+    uint32_t start;
+    uint32_t start2 = micros();
+    for (j = 0; j < line; j++)
+    {
+        start = micros();
+        for (i = 0; i < strip.numPixels(); i++)
+        {
+            strip.setPixelColor(i, mario[i][j]);
+        }
+        strip.show();
+        delayMicroseconds((wait_ms * 1000) - (micros() - start));
+    }
+    Serial.println(micros() - start2);
+}
+
+int btn = 0;
 void loop()
 {
     M5.MPU6886.getAccelData(&ax, &ay, &az);
@@ -85,20 +126,31 @@ void loop()
     M5.update();
     if (M5.BtnA.wasPressed())
     {
-        btn = !btn;
+        btn++;
     }
+
     if ((cvec[0] + cvec[1] + cvec[2]) / 3 > 2.0)
     {
         cvec[0] = 0;
         cvec[1] = 0;
         cvec[2] = 0;
-        if (btn)
+        switch (btn)
         {
-            honoo_no_kokyuu(5);
-        }
-        else
-        {
+        case 0:
             mizu_no_kokyuu(5);
+            break;
+        case 1:
+            honoo_no_kokyuu(5);
+            break;
+        case 2:
+            kaminari_no_kokyuu(5);
+            break;
+        case 3:
+            kaminari_no_mario(5);
+            break;
+        default:
+            btn = 0;
+            break;
         }
         strip.clear();
         strip.show();
